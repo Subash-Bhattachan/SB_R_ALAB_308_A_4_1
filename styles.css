@@ -77,3 +77,9 @@ body {
     height: 17em;
   }
 }
+
+.carousel-inner img {
+  max-height: 400px; /* Adjust the maximum height of images */
+  object-fit: cover; /* Makes sure images cover the area without distortion */
+}
+

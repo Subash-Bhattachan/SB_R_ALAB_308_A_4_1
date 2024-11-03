@@ -1,4 +1,4 @@
-import * as Carousel from "./Carousel.js";
+import * as Carousel from "./Carousel.js"
 import axios from "axios";
 
 // The breed selection input element.
@@ -11,10 +11,12 @@ const progressBar = document.getElementById("progressBar");
 const getFavouritesBtn = document.getElementById("getFavouritesBtn");
 
 // Step 0: Store your API key here for reference and easy access.
-const API_KEY = "";
+const API_KEY =
+  "live_WlRTVBHIH4AN7yJo2s0Aw3fK5N7QJ7dXF2FrUqUmpArFGhWZ1pP4KIaYnVFSl0WB";
+
 console.log("testllllll");
 
-getFavouritesBtn.textContent = "ollss6767ss";
+//getFavouritesBtn.textContent = "ollssss";
 
 /**
  * 1. Create an async function "initialLoad" that does the following:
@@ -24,6 +26,34 @@ getFavouritesBtn.textContent = "ollss6767ss";
  *  - Each option should display text equal to the name of the breed.
  * This function should execute immediately.
  */
+async function initialLoad() {
+  try {
+    // fetching the list of breeds from the API
+    const response = await fetch("https://api.thecatapi.com/v1/breeds");
+    const breeds = await response.json();
+
+    // now creating option for each breed by using for loop
+    breeds.forEach((breed) => {
+      const option = document.createElement("option");
+
+      breedSelect.appendChild(option);
+      option.value = breed.id;
+      option.textContent = breed.name;
+    });
+
+    breedSelect.addEventListener("change", startCarousel);
+    startCarousel();
+    //moveCarousels();
+
+    // to start the Carousel
+  } catch (error) {
+    console.error("There is some error while fetching breed data", error);
+  }
+  //console.log(jsonData);
+  //console.log("hello22222");
+}
+//initialLoad();
+
 
 /**
  * 2. Create an event handler for breedSelect that does the following:
@@ -39,6 +69,111 @@ getFavouritesBtn.textContent = "ollss6767ss";
  * - Each new selection should clear, re-populate, and restart the Carousel.
  * - Add a call to this function to the end of your initialLoad function above to create the initial carousel.
  */
+
+
+async function startCarousel() {
+const selectedBreedId = breedSelect.value;
+const carouselInner = document.getElementById("carouselInner");
+
+console.log("Selected Breed ID:", selectedBreedId);
+
+
+// cleaning previous carousel images and info
+  carouselInner.innerHTML = "";
+  infoDump.innerHTML = "";
+
+try {
+
+  const responseArr = await fetch(
+    `https://api.thecatapi.com/v1/images/search?breed_ids=${selectedBreedId}&limit=5`
+  );
+  const catImages = await responseArr.json();
+  
+  console.log(catImages);
+
+  if(!catImages || catImages.length === 0) {
+    infoDump.innerHTML = "There are no images available for this breed.";
+    return;
+  }
+  
+// to create carousel images
+  catImages.forEach((catImage, index) => {
+    const itemDiv = document.createElement("div");
+    itemDiv.classList.add("carousel-item");
+
+    if (index === 0) {
+      itemDiv.classList.add("active");
+    }
+    
+    const imgElement = document.createElement("img");
+    imgElement.src = catImage.url;
+    //imgElement.alt = `Image of ${catImage.breeds[0]?.name || "cat"}`;
+    //const breedName = catImage.breeds && catImage.breeds.length > 0 ? catImage.breeds[0].name : "cat";
+    //imgElement.alt = `Image of ${breedName}`;
+    imgElement.classList.add("d-block", "w-100");
+    
+    itemDiv.appendChild(imgElement);
+    carouselInner.appendChild(itemDiv);
+  });
+const selectedBreed = document.getElementById("breedSelect")
+const breedDescription = selectedBreed.textContent;
+//const breedInfo = catImages[0]?.breeds[0]
+
+const infoContent =
+
+  `<h2>Breed Name Id: ${selectedBreedId}</h2>
+    <li>${catImages.name}</li>
+
+  <li>${catImages.length} images are available.</li>`
+
+ // <li>${selectedBreed.origin}</li>
+ // <li>${selectedBreed.life_span}</li>
+
+  //;
+  //   //const breedInfo = catImages[0]?.breeds[0] || {
+  //    const firstCatImage = catImages[0];
+  //   if (firstCatImage && firstCatImage.breeds && firstCatImage.breeds.length > 0) {
+     if (selectedBreed) {
+  //      const breedInfo = firstCatImage.breeds[0];
+  //      const infoContent = breedInfo.name;
+
+      infoDump.innerHTML = infoContent;
+    }
+    else {
+      infoDump.innerHTML = "There is no breed information available.";
+
+    }
+
+    //moveCarousels();
+
+  } catch (error) {
+    console.error("There is an error fetching images:", error);
+    infoDump.innerHTML = "Loading images has failed. Try again."
+  }
+}
+
+
+// function moveCarousels() {
+//   const carousel = new bootstrap.Carousel(document.getElementById('carouselExampleControls'));
+
+//     const prevBtn = document.querySelector(".carousel-control-prev");
+//     const nextBtn = document.querySelector(".carousel-control-next");
+
+//     prevBtn.addEventListener("click", () => {
+//         carousel.prev(); // Move to the previous item
+//     });
+
+//     nextBtn.addEventListener("click", () => {
+//         carousel.next(); // Move to the next item
+//     });
+// }
+
+
+initialLoad();
+  
+
+
+
 
 /**
  * 3. Fork your own sandbox, creating a new one named "JavaScript Axios Lab."
