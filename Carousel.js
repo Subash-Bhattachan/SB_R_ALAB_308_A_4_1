@@ -121,13 +121,13 @@ export async function addFavourite(catImageId) {
     const imgElement = document.createElement("img");
     //imgElement.src = catImage.url;
     imgElement.alt = "Cat";
-
+    console.log(catImage.url);
     // adding check to make sure that the data is available or not
     if (catImage && catImage.url) {
       imgElement.src = catImage.url;
 
     }else {
-      imgElement.src = "./cat.jpg";
+      imgElement.src = "cat.jpg"; // placeholder image trying to place there but not working
     }
   
     // this will create the favourite heart button

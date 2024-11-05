@@ -1,4 +1,4 @@
-import * as Carousel from "./Carousel.js";
+//import * as Carousel from "./Carousel.js";
 import axios from "axios";
 import { getBreeds, getBreedImages } from "./axios.js";
 import { start } from "./Carousel.js";
@@ -92,12 +92,7 @@ console.log("Selected Breed ID:", selectedBreedId);
 
 try {
 
-  // const responseArr = await fetch(
-  //   `https://api.thecatapi.com/v1/images/search?breed_ids=${selectedBreedId}&limit=5`
-  // );
-  // const catImages = await responseArr.json();
-
-  const catImages = await getBreedImages();
+   const catImages = await getBreedImages();
   
   //console.log(catImages);
 
@@ -117,9 +112,7 @@ try {
     
     const imgElement = document.createElement("img");
     imgElement.src = catImage.url;
-    //imgElement.alt = `Image of ${catImage.breeds[0]?.name || "cat"}`;
-    //const breedName = catImage.breeds && catImage.breeds.length > 0 ? catImage.breeds[0].name : "cat";
-    //imgElement.alt = `Image of ${breedName}`;
+    
     imgElement.classList.add("d-block", "w-100");
     
     itemDiv.appendChild(imgElement);
@@ -136,13 +129,6 @@ const infoContent =
 
   <li>${catImages.length} images are available.</li>`
 
- // <li>${selectedBreed.origin}</li>
- // <li>${selectedBreed.life_span}</li>
-
-  //;
-  //   //const breedInfo = catImages[0]?.breeds[0] || {
-  //    const firstCatImage = catImages[0];
-  //   if (firstCatImage && firstCatImage.breeds && firstCatImage.breeds.length > 0) {
      if (selectedBreed) {
   //      const breedInfo = firstCatImage.breeds[0];
   //      const infoContent = breedInfo.name;
@@ -161,23 +147,6 @@ const infoContent =
     infoDump.innerHTML = "Loading images has failed. Try again."
   }
 }
-
-
-// function moveCarousels() {
-//   const carousel = new bootstrap.Carousel(document.getElementById('carouselExampleControls'));
-
-//     const prevBtn = document.querySelector(".carousel-control-prev");
-//     const nextBtn = document.querySelector(".carousel-control-next");
-
-//     prevBtn.addEventListener("click", () => {
-//         carousel.prev(); // Move to the previous item
-//     });
-
-//     nextBtn.addEventListener("click", () => {
-//         carousel.next(); // Move to the next item
-//     });
-// }
-
 
 initialLoad();
   
@@ -236,20 +205,6 @@ initialLoad();
  *   you delete that favourite using the API, giving this function "toggle" functionality.
  * - You can call this function by clicking on the heart at the top right of any image.
  */
-//export async function favourite(imgId) {
-  // your code here
-//}
-// async function populateCarousel(catImages) {
-//   const carouselContainer = document.getElementById("carouselInner");
-//   carouselContainer.innerHTML = "";
-
-//   catImages.forEach(catImage => {
-//     const carouselItem = createCarouselItem(catImage);
-//     carouselContainer.appendChild(carouselItem);
-//   })
-// }
-
-//createCarouselItems();
 
 
 document.getElementById("breedSelect").addEventListener ("change", async (event) => {
@@ -375,7 +330,7 @@ async function getBreedInfo(breedId) {
 
 async function getBreedById(breedId) {
   try {
-    const response = await axios.get (`https://api.thecatapi.com/v1/images/${breedId}`, {
+    const response = await axios.get(`https://api.thecatapi.com/v1/images/${breedId}`, {
       headers: {
         'x-api-key': "live_WlRTVBHIH4AN7yJo2s0Aw3fK5N7QJ7dXF2FrUqUmpArFGhWZ1pP4KIaYnVFSl0WB"
       }
@@ -388,9 +343,4 @@ async function getBreedById(breedId) {
   }
 }
 //Malayan
-//getBreedById(Mal);
-
-
-//const Malayan = "Malayan Cat"; // Declare the variable
-
-//console.log(Malayan); // Now it can be used
+getBreedById(78);
