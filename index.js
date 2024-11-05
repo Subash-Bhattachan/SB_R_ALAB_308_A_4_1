@@ -1,5 +1,8 @@
-import * as Carousel from "./Carousel.js"
+import * as Carousel from "./Carousel.js";
 import axios from "axios";
+import { getBreeds, getBreedImages } from "./axios.js";
+import { start } from "./Carousel.js";
+import { createCarouselItems } from "./Carousel.js";
 
 // The breed selection input element.
 const breedSelect = document.getElementById("breedSelect");
@@ -29,8 +32,10 @@ console.log("testllllll");
 async function initialLoad() {
   try {
     // fetching the list of breeds from the API
-    const response = await fetch("https://api.thecatapi.com/v1/breeds");
-    const breeds = await response.json();
+    // const response = await fetch("https://api.thecatapi.com/v1/breeds");
+    // const breeds = await response.json();
+
+    const breeds = await getBreeds();
 
     // now creating option for each breed by using for loop
     breeds.forEach((breed) => {
@@ -44,6 +49,9 @@ async function initialLoad() {
     breedSelect.addEventListener("change", startCarousel);
     startCarousel();
     //moveCarousels();
+    document.addEventListener("DOMContentLoaded", () => {
+      start();
+    })
 
     // to start the Carousel
   } catch (error) {
@@ -84,12 +92,14 @@ console.log("Selected Breed ID:", selectedBreedId);
 
 try {
 
-  const responseArr = await fetch(
-    `https://api.thecatapi.com/v1/images/search?breed_ids=${selectedBreedId}&limit=5`
-  );
-  const catImages = await responseArr.json();
+  // const responseArr = await fetch(
+  //   `https://api.thecatapi.com/v1/images/search?breed_ids=${selectedBreedId}&limit=5`
+  // );
+  // const catImages = await responseArr.json();
+
+  const catImages = await getBreedImages();
   
-  console.log(catImages);
+  //console.log(catImages);
 
   if(!catImages || catImages.length === 0) {
     infoDump.innerHTML = "There are no images available for this breed.";
@@ -226,9 +236,62 @@ initialLoad();
  *   you delete that favourite using the API, giving this function "toggle" functionality.
  * - You can call this function by clicking on the heart at the top right of any image.
  */
-export async function favourite(imgId) {
+//export async function favourite(imgId) {
   // your code here
-}
+//}
+// async function populateCarousel(catImages) {
+//   const carouselContainer = document.getElementById("carouselInner");
+//   carouselContainer.innerHTML = "";
+
+//   catImages.forEach(catImage => {
+//     const carouselItem = createCarouselItem(catImage);
+//     carouselContainer.appendChild(carouselItem);
+//   })
+// }
+
+//createCarouselItems();
+
+
+document.getElementById("breedSelect").addEventListener ("change", async (event) => {
+  const selectedBreedId = event.target.value;
+
+  try {
+    const response = await axios.get(`https://api.thecatapi.com/v1/images/search?breed_ids=${selectedBreedId}&limit=10`, {
+      headers: {
+        'x-api-key': "live_WlRTVBHIH4AN7yJo2s0Aw3fK5N7QJ7dXF2FrUqUmpArFGhWZ1pP4KIaYnVFSl0WB"
+      }
+    });
+    const carouselInner = document.getElementById("carouselInner");
+    carouselInner.innerHTML = "";
+
+    if (Array.isArray(response.data)) {
+      //this creates carousel items for each image that is fetched
+
+      response.data.forEach(cat => {
+        if (cat && cat.url && cat.id) {
+          createCarouselItems(cat);
+        }
+        else {
+          console.error("Cat image data is not valid:", cat);
+
+        }
+        
+       });
+      } else {
+        console.error("The response.data has to be array:", response.data);
+
+      }
+
+    } catch (error) {
+      console.error("Error fetching the breed images:", error);
+    }
+
+});
+
+
+
+
+
 
 /**
  * 9. Test your favourite() function by creating a getFavourites() function.
@@ -240,6 +303,34 @@ export async function favourite(imgId) {
  *    repeat yourself in this section.
  */
 
+async function getFavourites() {
+  try {
+    const response = await axios.get("https://api.thecatapi.com/v1/favourites", {
+      headers: {
+        'x-api-key': "live_WlRTVBHIH4AN7yJo2s0Aw3fK5N7QJ7dXF2FrUqUmpArFGhWZ1pP4KIaYnVFSl0WB"
+      }
+    });
+    const carouselInner = document.getElementById("carouselInner");
+    carouselInner.innerHTML = ""; // this clears the existing carousel items
+
+    if (response.data && response.data.length > 0) {
+      response.data.forEach((favImage, index) => {
+        createCarouselItems(favImage.image, index === 0);
+      });
+    } else {
+      console.log("There are no favourites found here.")
+    }
+
+  } catch (error) {
+    console.error("There is error while fetching favourites:", error);
+  }
+}
+
+// now adding the event listener in the Get Favoutites button 
+document.getElementById("getFavouritesBtn").addEventListener("click", getFavourites);
+
+
+
 /**
  * 10. Test your site, thoroughly!
  * - What happens when you try to load the Malayan breed?
@@ -247,3 +338,59 @@ export async function favourite(imgId) {
  * - Test other breeds as well. Not every breed has the same data available, so
  *   your code should account for this.
  */
+
+async function getBreedInfo(breedId) {
+  try {
+  const response = await axios.get(`https://api.thecatapi.com/v1/images/search?breed_ids=${breedId}`, {
+      headers: {
+        'x-api-key': "live_WlRTVBHIH4AN7yJo2s0Aw3fK5N7QJ7dXF2FrUqUmpArFGhWZ1pP4KIaYnVFSl0WB"
+      }
+    });
+
+    const breedInfo = response.data;
+
+    if (breedInfo.length > 0) {
+      const breed = breedInfo[0];
+      if (breed.breeds && breed.breeds.length > 0) {
+        const breedDetails = breed.breeds[0];
+        console.log("Breed Details:", breedDetails);
+        return breed;
+      }else {
+        console.log("There are no data available for this particular image.")
+        return null;
+      }
+
+
+    }
+  } catch (error) {
+    console.error("There has been error while fetching the breed data here:", error);
+  }
+}
+
+
+
+
+
+// to test the breed whose images are not available
+
+async function getBreedById(breedId) {
+  try {
+    const response = await axios.get (`https://api.thecatapi.com/v1/images/${breedId}`, {
+      headers: {
+        'x-api-key': "live_WlRTVBHIH4AN7yJo2s0Aw3fK5N7QJ7dXF2FrUqUmpArFGhWZ1pP4KIaYnVFSl0WB"
+      }
+    });
+
+    console.log(response.data);
+  }catch (error) {
+    console.error("There has been error while fetching breed data:", error);
+
+  }
+}
+//Malayan
+//getBreedById(Mal);
+
+
+//const Malayan = "Malayan Cat"; // Declare the variable
+
+//console.log(Malayan); // Now it can be used
